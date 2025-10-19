@@ -20,9 +20,24 @@ class Environment:
 
 
 class Evaluator:
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
+
     def evaluate(self, node, env):
         # Handle Token (literal)
         if isinstance(node, Token):
+            if node.type == "EMOJI" and node.value == "⏱️":
+                import time
+                if not self.start_time:
+                    self.start_time = time.time()
+                    return {"type": "timer", "value": "started"}
+                else:
+                    self.end_time = time.time()
+                    runtime = self.end_time - self.start_time
+                    self.start_time = None
+                    self.end_time = None
+                    return {"type": "timer", "value": f"Runtime: {runtime:.4f} seconds"}
             if node.type == "INT":
                 return {"type": "int", "value": int(node.value)}
             if node.type == "FLOAT":

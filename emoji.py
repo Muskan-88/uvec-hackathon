@@ -87,6 +87,7 @@ class Lexer:
             '🎲': 'RANDOM',      # Random number generator
             '(': 'LPAREN',
             ')': 'RPAREN',
+            '⏱️': 'timer',       # Timer
         }
         #EmojiNumeralsMapping:ConvertEmojiDigitsToNumbers
         self.emoji_digits = {
@@ -239,7 +240,10 @@ class Parser:
         return statements
     
     def statement(self):
-        if self.match('STORE'):
+        if self.match('timer'):
+            self.consume('timer')
+            return ('timer',)
+        elif self.match('STORE'):
             return self.assignment()
         # Allow shorthand assignment: ID ASSIGN expr
         if self.match('ID') and self.peek_type(1) == 'ASSIGN':
@@ -518,6 +522,7 @@ class Interpreter:
     def __init__(self):
         self.globals = {}
         self.scopes = [self.globals]
+        self.start_time = None
         # Mapping from emoji-only program strings to English output
         self.output_translations = {
             "🔢❓": "Guess the number:",
@@ -554,7 +559,18 @@ class Interpreter:
         if node is None:
             return None
         
-        if node[0] == 'num':
+        if node[0] == 'timer':
+            import time
+            if not self.start_time:
+                self.start_time = time.time()
+                return {"type": "timer", "value": "Timer started"}
+            else:
+                end_time = time.time()
+                runtime = end_time - self.start_time
+                self.start_time = None
+                print(f"\n⏱️ Runtime: {runtime:.4f} seconds")
+                return {"type": "timer", "value": runtime}
+        elif node[0] == 'num':
             return node[1]
         elif node[0] == 'str':
             return node[1]
@@ -718,7 +734,22 @@ class Interpreter:
         
         return result
 
+class EmojiHandler:
+    TIMER_EMOJI = "⏱️"
+    
+    @staticmethod
+    def is_timer(token_value: str) -> bool:
+        return token_value == EmojiHandler.TIMER_EMOJI
+    
+    @staticmethod
+    def get_emoji_type(emoji: str) -> str:
+        emoji_types: Dict[str, str] = {
+            EmojiHandler.TIMER_EMOJI: "timer"
+        }
+        return emoji_types.get(emoji, "unknown")
+
 demo_program = """
+⏱️
 📦 🟢 ➡️ 1️⃣
 📦 🔵 ➡️ 🔟
 📦 🔒 ➡️ 🎲 🟢 🔵
@@ -739,6 +770,7 @@ demo_program = """
         🔚
     🔚
 🔚
+⏱️
 """
 
 # Emoji language reference
