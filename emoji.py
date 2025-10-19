@@ -265,16 +265,34 @@ class Parser:
     
     def assignment(self):
         self.consume('STORE')
-        var_name = self.consume('ID').value
+        
+        # Check that next token is an identifier, not something else
+        if not self.match('ID'):
+            current_token = self.current()
+            raise SyntaxError(f"❌ Error at line {current_token.line}: Cannot assign to {current_token.type}. Expected a variable name after 📦 (STORE), got {current_token.value}.")
+        
+        var_name_token = self.consume('ID')
+        var_name = var_name_token.value
+        
+        # Validate that we're assigning to an identifier, not an expression
+        if not isinstance(var_name, str):
+            raise SyntaxError(f"❌ Error at line {var_name_token.line}: Cannot assign to {var_name}. Expected a variable name after 📦.")
+        
         self.consume('ASSIGN')
         value = self.expression()
-        return ('assign', var_name, value)
+        return ('assign', var_name, value, 'new_var')  # Mark as new variable declaration
 
     def assignment_short(self):
-        var_name = self.consume('ID').value
+        var_name_token = self.consume('ID')
+        var_name = var_name_token.value
+        
+        # Validate that we're assigning to an identifier
+        if not isinstance(var_name, str):
+            raise SyntaxError(f"❌ Error at line {var_name_token.line}: Cannot assign to {var_name}. Expected a variable name.")
+        
         self.consume('ASSIGN')
         value = self.expression()
-        return ('assign', var_name, value)
+        return ('assign', var_name, value)  # Regular reassignment
 
     def peek_type(self, offset: int) -> Optional[str]:
         idx = self.pos + offset
@@ -523,6 +541,7 @@ class Interpreter:
         self.globals = {}
         self.scopes = [self.globals]
         self.start_time = None
+        self.strict_mode = True  # Enable strict variable checking
         # Mapping from emoji-only program strings to English output
         self.output_translations = {
             "🔢❓": "Guess the number:",
@@ -531,6 +550,9 @@ class Interpreter:
             "✅🎉": "Correct! You guessed it.",
             "📈❌": "Too high!",
             "📉❌": "Too low!",
+            "⚠️📉 🔢⬇️": "⚠️  Invalid input! Number must be at least ",
+            "⚠️📈 🔢⬆️": "⚠️  Invalid input! Number must be at most ",
+            "⚠️❌ 🔤🚫": "⚠️  Invalid input! Please enter a number.",
         }
         # Emoji numerals map for translating emoji numerals inside strings
         self.emoji_digits = {
@@ -579,7 +601,24 @@ class Interpreter:
         elif node[0] == 'var':
             return self.get_var(node[1])
         elif node[0] == 'assign':
+            var_name = node[1]
             value = self.eval(node[2])
+            
+            # Validate variable name is not a reserved keyword or invalid
+            if not isinstance(var_name, str):
+                raise RuntimeError(f"❌ Error: Cannot assign to {var_name}. Assignment target must be a variable name.")
+            
+            # Check if trying to assign to a keyword-like name
+            reserved = ['if', 'else', 'while', 'true', 'false', 'print', 'return', 'end']
+            if var_name.lower() in reserved:
+                raise RuntimeError(f"❌ Error: Cannot assign to reserved keyword '{var_name}'.")
+            
+            # For STORE (📦), check if variable already exists in current scope
+            if len(node) > 3 and node[3] == 'new_var':
+                # This is a STORE operation, check for redeclaration
+                if self.strict_mode and var_name in self.scopes[-1]:
+                    raise RuntimeError(f"❌ Error: Variable '{var_name}' is already declared in this scope. Use ➡️ (without 📦) to reassign.")
+            
             self.set_var(node[1], value)
             return value
         elif node[0] == 'binop':
@@ -687,10 +726,28 @@ class Interpreter:
         elif op == '-': return left_val - right_val
         elif op == '*': return left_val * right_val
         elif op == '/': return left_val / right_val
-        elif op == '==': return left_val == right_val
-        elif op == '!=': return left_val != right_val
-        elif op == '<': return left_val < right_val
-        elif op == '>': return left_val > right_val
+        elif op == '==':
+            try:
+                return left_val == right_val
+            except TypeError:
+                return False
+        elif op == '!=':
+            try:
+                return left_val != right_val
+            except TypeError:
+                return True  # Different types are not equal
+        elif op == '<':
+            try:
+                return left_val < right_val
+            except TypeError:
+                # If types aren't comparable, treat string input as invalid (always false for numeric comparisons)
+                return False
+        elif op == '>':
+            try:
+                return left_val > right_val
+            except TypeError:
+                # If types aren't comparable, treat string input as invalid (always false for numeric comparisons)
+                return False
         else:
             raise RuntimeError(f"Unknown operator: {op}")
     
@@ -704,9 +761,17 @@ class Interpreter:
         for scope in reversed(self.scopes):
             if name in scope:
                 return scope[name]
-        raise NameError(f"Undefined variable: {name}")
+        raise NameError(f"❌ Error: Variable '{name}' is not defined. Did you forget to declare it with 📦?")
     
     def set_var(self, name, value):
+        # For strict mode, when using shorthand assignment, check if variable exists
+        if self.strict_mode:
+            # Check if variable exists in any scope
+            exists = any(name in scope for scope in self.scopes)
+            if not exists:
+                # Allow setting in current scope for new declarations (when using 📦)
+                pass
+        
         for scope in reversed(self.scopes):
             if name in scope:
                 scope[name] = value
@@ -749,111 +814,84 @@ class EmojiHandler:
         return emoji_types.get(emoji, "unknown")
 
 demo_program = """
-⏱️
-📦 🟢 ➡️ 1️⃣
-📦 🔵 ➡️ 🔟
-📦 🔒 ➡️ 🎲 🟢 🔵
+💭 NUMBER GUESSING GAME - Guess a number from 1 to 10
 
-🖨️ "🔢❓ 1️⃣ ➡️ 🔟"
+⏱️  💭 Start timer to measure execution time
 
-📦 🏃 ➡️ ✅
+💭 Initialize game constants
+📦 🟢 ➡️ 1️⃣              💭 Store minimum value (1) in variable 🟢 (green/low)
+📦 🔵 ➡️ 🔟              💭 Store maximum value (10) in variable 🔵 (blue/high)
+📦 🔒 ➡️ 🎲 🟢 🔵        💭 Generate random secret number between 🟢 and 🔵, store in 🔒 (lock/secret)
+
+💭 Display welcome message
+🖨️ "🔢❓ 1️⃣ ➡️ 🔟"      💭 Print "Guess the number: 1 to 10"
+
+💭 Initialize game loop variables
+📦 🏃 ➡️ ✅              💭 Store running flag (true) in 🏃 (runner/running)
+📦 🟣 ➡️ 0️⃣              💭 Initialize guess variable 🟣 (purple/guess) to 0
+📦 🆚 ➡️ ❌              💭 Initialize validation flag 🆚 (vs/valid) to false
+
+💭 Main game loop - continues while 🏃 is true
 🔁 🏃 👉
-    📦 🟣 ➡️ 📝 "🔢➡️"
-    ❓ 🟣 🟰 🔒 👉
-        🖨️ "✅🎉"
-        📦 🏃 ➡️ ❌
+    💭 Get user input
+    🟣 ➡️ 📝 "🔢➡️"      💭 Read input from user with prompt "Enter your guess:", store in 🟣
+    
+   
+    💭 If it fails comparison, it's not a number (probably text)
+    
+    🆚 ➡️ ❌              💭 Reset validation flag to false
+    ❓ 🟣 ⬆️ 0️⃣ 👉        💭 If guess > 0
+        🆚 ➡️ ✅          💭   Then it's a valid number, set 🆚 to true
     ❔ 👉
-        ❓ 🟣 ⬆️ 🔒 👉
-            🖨️ "📈❌"
+        ❓ 🟣 ⬇️ 0️⃣ 👉    💭 Else if guess < 0
+            🆚 ➡️ ✅      💭   Then it's a valid number (negative), set 🆚 to true
         ❔ 👉
-            🖨️ "📉❌"
+            ❓ 🟣 🟰 0️⃣ 👉  💭 Else if guess == 0
+                🆚 ➡️ ✅  💭   Then it's a valid number (zero), set 🆚 to true
+            🔚
         🔚
     🔚
-🔚
-⏱️
+    
+    💭 ====================================================
+    💭 ERROR HANDLING & GAME LOGIC
+    💭 ====================================================
+    
+    ❓ 🆚 🟰 ❌ 👉        💭 If validation flag is still false (invalid input)
+        🖨️ "⚠️❌ 🔤🚫"   💭   Print error: "Invalid input! Please enter a number."
+    ❔ 👉                 💭 Else (input is a valid number)
+        💭 Check if number is within valid range (1-10)
+        ❓ 🟣 ⬇️ 🟢 👉    💭 If guess < minimum (1)
+            🖨️ "⚠️📉 🔢⬇️1️⃣"  💭   Print error: "Number must be at least 1"
+        ❔ 👉
+            ❓ 🟣 ⬆️ 🔵 👉  💭 Else if guess > maximum (10)
+                🖨️ "⚠️📈 🔢⬆️🔟"  💭   Print error: "Number must be at most 10"
+            ❔ 👉          💭 Else (guess is in valid range)
+                💭 Check if guess matches secret number
+                ❓ 🟣 🟰 🔒 👉  💭 If guess == secret
+                    🖨️ "✅🎉"  💭   Print "Correct! You guessed it."
+                    🏃 ➡️ ❌   💭   Set running to false to exit loop
+                ❔ 👉        💭 Else (guess is wrong)
+                    💭 Give hint whether guess is too high or too low
+                    ❓ 🟣 ⬆️ 🔒 👉  💭 If guess > secret
+                        🖨️ "📈❌"  💭   Print "Too high!"
+                    ❔ 👉      💭 Else (guess < secret)
+                        🖨️ "📉❌"  💭   Print "Too low!"
+                    🔚
+                🔚
+            🔚
+        🔚
+    🔚
+🔚  💭 End of while loop
+
+⏱️  💭 End timer and display elapsed time
 """
 
-# Emoji language reference
-emoji_reference = """
-╔══════════════════════════════════════════════════════════════╗
-║           🎨 EMOJISCRIPT LANGUAGE REFERENCE 🎨              ║
-╠══════════════════════════════════════════════════════════════╣
-║                                                              ║
-║  📦 VARIABLES & ASSIGNMENT                                   ║
-║  ───────────────────────────────────────────────────────────║
-║  📦 x ➡️ 5          Store value in variable                 ║
-║  📦 name ➡️ "Hi"    Store string in variable                ║
-║                                                              ║
-║  🖨️ OUTPUT                                                   ║
-║  ───────────────────────────────────────────────────────────║
-║  🖨️ x               Print value                              ║
-║  🖨️ "Hello"         Print string                             ║
-║                                                              ║
-║  ➕ MATH OPERATORS                                           ║
-║  ───────────────────────────────────────────────────────────║
-║  ➕                  Addition                                ║
-║  ➖                  Subtraction                             ║
-║  ✖️                  Multiplication                          ║
-║  ➗                  Division                                ║
-║                                                              ║
-║  🔍 COMPARISONS                                              ║
-║  ───────────────────────────────────────────────────────────║
-║  🟰                  Equals                                  ║
-║  ❌🟰                Not equals                              ║
-║  ⬆️                  Greater than                            ║
-║  ⬇️                  Less than                               ║
-║                                                              ║
-║  🤔 LOGIC                                                    ║
-║  ───────────────────────────────────────────────────────────║
-║  👨‍👩‍👧                  AND                                     ║
-║  👩‍👧                  OR                                      ║
-║  🚫                  NOT                                     ║
-║  ✅                  True                                    ║
-║  ❌                  False                                   ║
-║                                                              ║
-║  ❓ CONDITIONALS                                             ║
-║  ───────────────────────────────────────────────────────────║
-║  ❓ condition 👉     If statement                            ║
-║      ...                                                     ║
-║  ❔ 👉               Else                                    ║
-║      ...                                                     ║
-║  🔚                  End block                               ║
-║                                                              ║
-║  🔁 LOOPS                                                    ║
-║  ───────────────────────────────────────────────────────────║
-║  🔁 condition 👉    While loop                              ║
-║      ...                                                     ║
-║  🔚                                                          ║
-║                                                              ║
-║  🔂 n 👉            Repeat n times                          ║
-║      ...                                                     ║
-║  🔚                                                          ║
-║                                                              ║
-║  🎯 FUNCTIONS                                                ║
-║  ───────────────────────────────────────────────────────────║
-║  🎯 name 📥 a b 👉  Define function                         ║
-║      ...                                                     ║
-║      ⬅️ result      Return value                            ║
-║  🔚                                                          ║
-║                                                              ║
-║  name(x)            Call function                            ║
-║                                                              ║
-║  🔢 RANGES                                                   ║
-║  ───────────────────────────────────────────────────────────║
-║  🔢 0 10            Numbers from 0 to 10                    ║
-║                                                              ║
-║  💭 COMMENTS                                                 ║
-║  ───────────────────────────────────────────────────────────║
-║  💭 This is a comment                                        ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-"""
 
 if __name__ == "__main__":
     print("🎉 EmojiScript Interpreter 🎉")
     print("=" * 60)
     print("A programming language using ONLY EMOJIS!\n")
-    print(emoji_reference)
+    # print(emoji_reference)  # Reference removed
     print("\n" + "=" * 60)
     print("\n📝 Program Code:\n")
     print(demo_program)
