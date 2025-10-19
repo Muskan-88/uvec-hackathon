@@ -4,12 +4,12 @@ A programming language that uses ONLY EMOJIS! 🚀
 
 Language Syntax (Emoji-only examples):
 - Variables: 📦 🔵 ➡️ 5️⃣  (store 5 in variable 🔵)
-- Output: 📢 🔵  (print variable 🔵)
-- Output: 📢 "🎉"  (print emoji string)
+- Output: 🖨️ 🔵  (print variable 🔵)
+- Output: 🖨️ "🎉"  (print emoji string)
 - Math: ➕ ➖ ✖️ ➗ (add, subtract, multiply, divide)
 - Comparisons: 🟰 (equals), ❌🟰 (not equals), ⬆️ (greater), ⬇️ (less)
 - Boolean: ✅ (true), ❌ (false)
-- Logic: 🤝 (and), 🎭 (or), � (not)
+- Logic: 👨‍👩‍👧 (and), 👩‍👧 (or), � (not)
 - Comments: � This is a comment
 
 Examples:
@@ -17,17 +17,17 @@ Examples:
     � "✅🎉"
   If statement:
     ❓ 🔵 🟰 5️⃣ �👉
-        📢 "✅"
-    🔄 👉
-        📢 "❌"
+        🖨️ "✅"
+    ❔ 👉
+        🖨️ "❌"
     🔚
   While loop:
     📦 🟢 ➡️ 0️⃣
     🔁 � ⬇️ 🔟 👉
-        📢 🟢
+        🖨️ 🟢
         🟢 ➡️ 🟢 ➕ 1️⃣
     🔚
-  Repeat loop: 🔂 5️⃣ 👉 📢 "🎉" 🔚
+  Repeat loop: 🔂 5️⃣ 👉 🖨️ "🎉" 🔚
   Functions: 🎯 🌟 📥 🔵 🟢 👉 ... ⬅️ result 🔚
   Range: 🔢 0️⃣ 🔟 (numbers from 0 to 10)
   Input: � "🔢➡️" (prompt for input)
@@ -58,9 +58,9 @@ class Lexer:
         self.emoji_keywords = {
             '📦': 'STORE',      # Variable declaration/assignment
             '➡️': 'ASSIGN',     # Assignment operator
-            '📢': 'PRINT',      # Print/output
+            '🖨️': 'PRINT',      # Print/output
             '❓': 'IF',         # If statement
-            '🔄': 'ELSE',       # Else statement
+            '❔': 'ELSE',       # Else statement
             '🔁': 'WHILE',      # While loop
             '🔂': 'REPEAT',     # Repeat n times
             '🎯': 'DEFINE',     # Function definition
@@ -78,8 +78,8 @@ class Lexer:
             '❌🟰': 'NEQ',      # Not equals
             '⬆️': 'GT',         # Greater than
             '⬇️': 'LT',         # Less than
-            '🤝': 'AND',        # Logical and
-            '🎭': 'OR',         # Logical or
+            '👨‍👩‍👧': 'AND',        # Logical and
+            '👩‍👧': 'OR',         # Logical or
             '🚫': 'NOT',        # Logical not
             '🔢': 'RANGE',      # Range
             '💭': 'COMMENT',    # Comment
@@ -93,12 +93,6 @@ class Lexer:
             '0️⃣': '0', '1️⃣': '1', '2️⃣': '2', '3️⃣': '3', '4️⃣': '4',
             '5️⃣': '5', '6️⃣': '6', '7️⃣': '7', '8️⃣': '8', '9️⃣': '9',
             '🔟': '10'
-        }
-        #AlphabetEmojiMapping:ConvertLetterEmojisToCharacters
-        self.emoji_letters = {
-            '🅰️': 'a', '🅱️': 'b', '🆎': 'ab', '🅾️': 'o', '🆑': 'cl',
-            '🆒': 'cool', '🆓': 'free', '🆔': 'id', '🆕': 'new',
-            '🆖': 'ng', '🆗': 'ok', '🆘': 'sos', '🆙': 'up', '🆚': 'vs'
         }
     
     def tokenize(self) -> List[Token]:
@@ -729,19 +723,19 @@ demo_program = """
 📦 🔵 ➡️ 🔟
 📦 🔒 ➡️ 🎲 🟢 🔵
 
-📢 "🔢❓ 1️⃣ ➡️ 🔟"
+🖨️ "🔢❓ 1️⃣ ➡️ 🔟"
 
 📦 🏃 ➡️ ✅
 🔁 🏃 👉
     📦 🟣 ➡️ 📝 "🔢➡️"
     ❓ 🟣 🟰 🔒 👉
-        📢 "✅🎉"
+        🖨️ "✅🎉"
         📦 🏃 ➡️ ❌
-    🔄 👉
+    ❔ 👉
         ❓ 🟣 ⬆️ 🔒 👉
-            📢 "📈❌"
-        🔄 👉
-            📢 "📉❌"
+            🖨️ "📈❌"
+        ❔ 👉
+            🖨️ "📉❌"
         🔚
     🔚
 🔚
@@ -758,10 +752,10 @@ emoji_reference = """
 ║  📦 x ➡️ 5          Store value in variable                 ║
 ║  📦 name ➡️ "Hi"    Store string in variable                ║
 ║                                                              ║
-║  📢 OUTPUT                                                   ║
+║  🖨️ OUTPUT                                                   ║
 ║  ───────────────────────────────────────────────────────────║
-║  📢 x               Print value                              ║
-║  📢 "Hello"         Print string                             ║
+║  🖨️ x               Print value                              ║
+║  🖨️ "Hello"         Print string                             ║
 ║                                                              ║
 ║  ➕ MATH OPERATORS                                           ║
 ║  ───────────────────────────────────────────────────────────║
@@ -779,8 +773,8 @@ emoji_reference = """
 ║                                                              ║
 ║  🤔 LOGIC                                                    ║
 ║  ───────────────────────────────────────────────────────────║
-║  🤝                  AND                                     ║
-║  🎭                  OR                                      ║
+║  👨‍👩‍👧                  AND                                     ║
+║  👩‍👧                  OR                                      ║
 ║  🚫                  NOT                                     ║
 ║  ✅                  True                                    ║
 ║  ❌                  False                                   ║
@@ -789,7 +783,7 @@ emoji_reference = """
 ║  ───────────────────────────────────────────────────────────║
 ║  ❓ condition 👉     If statement                            ║
 ║      ...                                                     ║
-║  🔄 👉               Else                                    ║
+║  ❔ 👉               Else                                    ║
 ║      ...                                                     ║
 ║  🔚                  End block                               ║
 ║                                                              ║
