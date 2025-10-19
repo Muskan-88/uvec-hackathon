@@ -94,22 +94,12 @@ python3 emoji.py
 
 ## Error Handling
 
-The interpreter includes comprehensive error handling:
+The interpreter includes error handling:
 - ⚠️ Input validation (detects non-numeric input)
 - ❌ Variable redeclaration prevention
 - ❌ Undefined variable detection
 - ❌ Invalid assignment target checking
 - 🛡️ Type-safe comparisons
-
-## Project Structure
-
-```
-uvec-hackathon/
-├── emoji.py              # Main interpreter & demo
-├── DOCUMENTATION.md      # Complete language documentation
-├── README.md            # This file
-└── Evaluator.py         # Legacy code
-```
 
 ## Notes
 
@@ -131,7 +121,5 @@ Feel free to contribute by:
 GitHub: https://github.com/Muskan-88/uvec-hackathon
 
 ---
-
-**Happy Emoji Coding! 🎉💻🚀**
 
 *Created for the UVEC Hackathon*

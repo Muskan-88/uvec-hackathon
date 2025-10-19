@@ -13,8 +13,7 @@
 10. [Comments](#comments)
 11. [Built-in Features](#built-in-features)
 12. [Error Handling](#error-handling)
-13. [Example Programs](#example-programs)
-14. [Complete Emoji Reference](#complete-emoji-reference)
+13. [Complete Emoji Reference](#complete-emoji-reference)
 
 ---
 
@@ -160,11 +159,6 @@ variableName ➡️ newValue
 3. Can use regional indicator emojis: 🇦 🇧 🇨 ... 🇿
 4. Cannot use reserved keywords
 5. Cannot redeclare the same variable in the same scope
-
-### Variable Scope
-- **Global scope**: Variables declared at the top level
-- **Function scope**: Variables declared inside functions
-- **Block scope**: Variables declared inside loops/conditionals
 
 ---
 
@@ -539,117 +533,6 @@ When comparing incompatible types (e.g., string vs number):
 
 ---
 
-## Example Programs
-
-### 1. Hello World
-```
-🖨️ "👋🌍 Hello World!"
-```
-
-### 2. Simple Calculator
-```
-💭 Simple Calculator
-📦 🅰️ ➡️ 📝 "Enter first number:"
-📦 🅱️ ➡️ 📝 "Enter second number:"
-
-🖨️ "Sum:"
-🖨️ 🅰️ ➕ 🅱️
-
-🖨️ "Product:"
-🖨️ 🅰️ ✖️ 🅱️
-```
-
-### 3. Countdown Timer
-```
-💭 Countdown from 10 to 1
-📦 count ➡️ 🔟
-
-🔁 count ⬆️ 0️⃣ 👉
-    🖨️ count
-    count ➡️ count ➖ 1️⃣
-🔚
-
-🖨️ "🚀 Blast off!"
-```
-
-### 4. Even or Odd Checker
-```
-💭 Check if number is even or odd
-📦 num ➡️ 📝 "Enter a number:"
-
-💭 Note: This is a simplified check
-❓ num 🟰 2️⃣ 👉
-    🖨️ "Even"
-❔ 👉
-    ❓ num 🟰 1️⃣ 👉
-        🖨️ "Odd"
-    ❔ 👉
-        🖨️ "Other"
-    🔚
-🔚
-```
-
-### 5. Number Guessing Game (Complete)
-```
-💭 Number Guessing Game
-⏱️
-
-📦 🟢 ➡️ 1️⃣                  💭 Minimum value
-📦 🔵 ➡️ 🔟                  💭 Maximum value
-📦 🔒 ➡️ 🎲 🟢 🔵            💭 Random secret number
-
-🖨️ "🔢❓ Guess 1️⃣ to 🔟"
-
-📦 🏃 ➡️ ✅                  💭 Running flag
-📦 🟣 ➡️ 0️⃣                  💭 User guess
-📦 🆚 ➡️ ❌                  💭 Validation flag
-
-🔁 🏃 👉
-    🟣 ➡️ 📝 "Enter guess:"
-    
-    💭 Validate input
-    🆚 ➡️ ❌
-    ❓ 🟣 ⬆️ 0️⃣ 👉
-        🆚 ➡️ ✅
-    ❔ 👉
-        ❓ 🟣 ⬇️ 0️⃣ 👉
-            🆚 ➡️ ✅
-        ❔ 👉
-            ❓ 🟣 🟰 0️⃣ 👉
-                🆚 ➡️ ✅
-            🔚
-        🔚
-    🔚
-    
-    ❓ 🆚 🟰 ❌ 👉
-        🖨️ "⚠️ Invalid input!"
-    ❔ 👉
-        ❓ 🟣 ⬇️ 🟢 👉
-            🖨️ "⚠️ Too low! Min is 1️⃣"
-        ❔ 👉
-            ❓ 🟣 ⬆️ 🔵 👉
-                🖨️ "⚠️ Too high! Max is 🔟"
-            ❔ 👉
-                ❓ 🟣 🟰 🔒 👉
-                    🖨️ "✅🎉 Correct!"
-                    🏃 ➡️ ❌
-                ❔ 👉
-                    ❓ 🟣 ⬆️ 🔒 👉
-                        🖨️ "📈 Too high!"
-                    ❔ 👉
-                        🖨️ "📉 Too low!"
-                    🔚
-                🔚
-            🔚
-        🔚
-    🔚
-🔚
-
-⏱️
-```
-
----
-
 ## Complete Emoji Reference
 
 ### Keywords & Control Structures
@@ -722,29 +605,6 @@ When comparing incompatible types (e.g., string vs number):
 | 🎲 | RANDOM | `🎲 min max` | Random number |
 | 🔢 | RANGE | `🔢 start end` | Number range |
 | ⏱️ | TIMER | `⏱️` | Start/end timer |
-
-### Alphabet Emojis (Variable Names)
-
-| Emoji | Letter | Emoji | Letter | Emoji | Letter |
-|-------|--------|-------|--------|-------|--------|
-| 🇦 | A | 🇧 | B | 🇨 | C |
-| 🇩 | D | 🇪 | E | 🇫 | F |
-| 🇬 | G | 🇭 | H | 🇮 | I |
-| 🇯 | J | 🇰 | K | 🇱 | L |
-| 🇲 | M | 🇳 | N | 🇴 | O |
-| 🇵 | P | 🇶 | Q | 🇷 | R |
-| 🇸 | S | 🇹 | T | 🇺 | U |
-| 🇻 | V | 🇼 | W | 🇽 | X |
-| 🇾 | Y | 🇿 | Z | | |
-
-### Special Squared Letters
-
-| Emoji | Value |
-|-------|-------|
-| 🅰️ | a |
-| 🅱️ | b |
-| 🅾️ | o |
-| 🅿️ | p |
 
 ---
 
@@ -879,53 +739,6 @@ x ➡️ 1️⃣0️⃣      💭 Reassignment (no 📦)
     🖨️ x
 🔚
 ```
-
----
-
-## Additional Resources
-
-### File Structure
-```
-uvec-hackathon/
-├── emoji.py           # Main interpreter
-├── README.md          # Project overview
-├── DOCUMENTATION.md   # This file
-└── Evaluator.py      # Legacy code
-```
-
-### Running Custom Programs
-
-1. Edit the `demo_program` variable in `emoji.py`
-2. Or create a new Python file:
-```python
-from emoji import Lexer, Parser, Interpreter
-
-my_program = """
-🖨️ "Hello!"
-"""
-
-lexer = Lexer(my_program)
-tokens = lexer.tokenize()
-parser = Parser(tokens)
-ast = parser.parse()
-interpreter = Interpreter()
-interpreter.execute(ast)
-```
-
----
-
-## Conclusion
-
-**EmojiScript** provides a unique and fun way to learn programming concepts while using expressive emoji symbols. Whether you're building games, teaching programming, or just experimenting, EmojiScript offers a complete programming environment with:
-
-✅ Variables and data types  
-✅ Control flow (if/else, loops)  
-✅ Functions with parameters  
-✅ User input and output  
-✅ Error handling and validation  
-✅ Built-in utilities (random, timer)  
-
-**Happy Emoji Coding! 🎉🚀💻**
 
 ---
 
