@@ -88,11 +88,17 @@ class Lexer:
             '(': 'LPAREN',
             ')': 'RPAREN',
         }
-        # Emoji numerals mapping (single emoji -> digit string)
+        #EmojiNumeralsMapping:ConvertEmojiDigitsToNumbers
         self.emoji_digits = {
             '0️⃣': '0', '1️⃣': '1', '2️⃣': '2', '3️⃣': '3', '4️⃣': '4',
             '5️⃣': '5', '6️⃣': '6', '7️⃣': '7', '8️⃣': '8', '9️⃣': '9',
             '🔟': '10'
+        }
+        #AlphabetEmojiMapping:ConvertLetterEmojisToCharacters
+        self.emoji_letters = {
+            '🅰️': 'a', '🅱️': 'b', '🆎': 'ab', '🅾️': 'o', '🆑': 'cl',
+            '🆒': 'cool', '🆓': 'free', '🆔': 'id', '🆕': 'new',
+            '🆖': 'ng', '🆗': 'ok', '🆘': 'sos', '🆙': 'up', '🆚': 'vs'
         }
     
     def tokenize(self) -> List[Token]:
@@ -719,43 +725,25 @@ class Interpreter:
         return result
 
 demo_program = """
-�set_min_range_to_1
-📦 � ➡️ 1️⃣
-�set_max_range_to_10
-📦 � ➡️ �
-�generate_random_secret_number_between_min_and_max
-� � ➡️ 🎲 � 🔵
+📦 🟢 ➡️ 1️⃣
+📦 🔵 ➡️ 🔟
+📦 🔒 ➡️ 🎲 🟢 🔵
 
-💭print_guess_the_number_1_to_10
-� "🔢❓ 1️⃣ ➡️ 🔟"
+📢 "🔢❓ 1️⃣ ➡️ 🔟"
 
-💭set_game_running_flag_to_true
-� 🏃 ➡️ ✅
-💭while_game_is_running
-🔁 🏃 �
-    �get_user_guess_from_input
-    📦 🟣 ➡️ � "�➡️"
-    💭if_guess_equals_secret
-    ❓ 🟣 🟰 🔒 �
-        💭print_correct_you_win
-        � "✅�"
-        💭set_running_to_false_to_end_game
-        � 🏃 ➡️ ❌
-    💭else
+📦 🏃 ➡️ ✅
+🔁 🏃 👉
+    📦 🟣 ➡️ 📝 "🔢➡️"
+    ❓ 🟣 🟰 🔒 👉
+        📢 "✅🎉"
+        📦 🏃 ➡️ ❌
     🔄 👉
-        �if_guess_is_greater_than_secret
-        ❓ 🟣 ⬆️ � �
-            💭print_too_high
-            � "�❌"
-        💭else
+        ❓ 🟣 ⬆️ 🔒 👉
+            📢 "📈❌"
         🔄 👉
-            💭print_too_low
-            📢 "�❌"
-        💭end_inner_if
+            📢 "📉❌"
         🔚
-    💭end_outer_if
     🔚
-💭end_while_loop
 🔚
 """
 
